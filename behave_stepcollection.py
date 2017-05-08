@@ -25,6 +25,8 @@ def define_steps(package_regex, step_module, translations):
 
             members = inspect.getmembers(step_module, inspect.isfunction)
             for name, value in members:
+                if name.startswith('_'):  # Private function
+                    continue
                 for text in reversed(self.translation[name]):
                     value = step(text)(value)
                 setattr(module, name, value)
