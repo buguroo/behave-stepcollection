@@ -6,7 +6,6 @@ import re
 import sys
 import types
 
-from behave import step as step_decorator
 from behave.parser import Parser
 from behave.step_registry import StepRegistry
 from behave.step_registry import names as step_names
@@ -63,10 +62,14 @@ def define_steps(package_regex, step_module, translations, substeps=False):
             module.__doc__ = step_module.__doc__
             module.__path__ = []
             module.__loader__ = self
+            module.LANG = self.language
+
             if substeps:
                 module.substeps = SubSteps(language=self.language)
                 step_decorator = module.substeps.step
-            module.LANG = self.language
+            else:
+                from behave import step as step_decorator
+
 
             members = inspect.getmembers(step_module, inspect.isfunction)
             for name, value in members:
