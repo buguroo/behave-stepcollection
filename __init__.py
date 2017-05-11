@@ -27,6 +27,18 @@ class SubSteps:
         for step_type in step_names.split():
             setattr(self, step_type, self.registry.make_decorator(step_type))
 
+    @staticmethod
+    def run_match(match, context):
+        args = []
+        kwargs = {}
+        for arg in match.arguments:
+            if arg.name is not None:
+                kwargs[arg.name] = arg.value
+            else:
+                args.append(arg.value)
+
+        return match.func(context, *args, **kwargs)
+
     def run(self, text, context):
         """
         Parse the given text and yield step functions.
@@ -42,7 +54,7 @@ class SubSteps:
                     table=step.table,
                     text=step.text,
                     step_context=context)
-                yield match.run(context)
+                yield self.run_match(match, context)
 
 
 def define_steps(package_regex, step_module, translations, substeps=False):
