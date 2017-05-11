@@ -4,11 +4,12 @@ import re
 import sys
 import types
 
-from behave import step
+from behave import step as step_decorator
+
+from substeps import SubSteps
 
 
-def define_steps(package_regex, step_module, translations,
-                 step_decorator=step):
+def define_steps(package_regex, step_module, translations, substeps=False):
     class BehaveStepCollectionLoader:
         def __init__(self, language, translation):
             self.language = language
@@ -25,6 +26,9 @@ def define_steps(package_regex, step_module, translations,
             module.__doc__ = step_module.__doc__
             module.__path__ = []
             module.__loader__ = self
+            if substeps:
+                module.substeps = SubSteps(language=self.language)
+                step_decorator = module.substeps.step
             module.LANG = self.language
 
             members = inspect.getmembers(step_module, inspect.isfunction)
