@@ -1,7 +1,8 @@
 import imp
 import inspect
-import sys
 import re
+import sys
+import types
 
 from behave import step
 
@@ -29,8 +30,18 @@ def define_steps(package_regex, step_module, translations):
             for name, value in members:
                 if name.startswith('_'):  # Private function
                     continue
+
+                # Copy the function adding custom globals
+                new_globals = value.__globals__.copy()
+                new_globals['__language__'] = self.language
+
+                function_copy = types.FunctionType(
+                    value.__code__,
+                    new_globals)
+
                 for text in reversed(self.translation[name]):
-                    value = step(text)(value)
+                    value = step(text)(function_copy)
+
                 setattr(module, name, value)
 
             sys.modules.setdefault(fullname, module)
