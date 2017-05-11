@@ -37,7 +37,10 @@ def define_steps(package_regex, step_module, translations):
 
                 function_copy = types.FunctionType(
                     value.__code__,
-                    new_globals)
+                    new_globals,
+                    value.__name__,
+                    value.__defaults__,
+                    value.__closure__)
 
                 for text in reversed(self.translation[name]):
                     value = step(text)(function_copy)
