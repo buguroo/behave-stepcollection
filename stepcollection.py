@@ -8,7 +8,8 @@ from behave import step
 
 def define_steps(package_regex, step_module, translations):
     class BehaveStepCollectionLoader:
-        def __init__(self, translation):
+        def __init__(self, language, translation):
+            self.language = language
             self.translation = translation
 
         def load_module(self, fullname):
@@ -22,6 +23,7 @@ def define_steps(package_regex, step_module, translations):
             module.__doc__ = step_module.__doc__
             module.__path__ = []
             module.__loader__ = self
+            module.LANG = self.language
 
             members = inspect.getmembers(step_module, inspect.isfunction)
             for name, value in members:
@@ -47,7 +49,8 @@ def define_steps(package_regex, step_module, translations):
                 except KeyError:
                     return None
                 else:
-                    return BehaveStepCollectionLoader(translation)
+                    return BehaveStepCollectionLoader(request_lang,
+                                                      translation)
             else:
                 return None
 
