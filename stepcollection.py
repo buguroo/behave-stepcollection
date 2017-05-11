@@ -7,7 +7,8 @@ import types
 from behave import step
 
 
-def define_steps(package_regex, step_module, translations):
+def define_steps(package_regex, step_module, translations,
+                 step_decorator=step):
     class BehaveStepCollectionLoader:
         def __init__(self, language, translation):
             self.language = language
@@ -43,7 +44,7 @@ def define_steps(package_regex, step_module, translations):
                     value.__closure__)
 
                 for text in reversed(self.translation[name]):
-                    value = step(text)(function_copy)
+                    value = step_decorator(text)(function_copy)
 
                 setattr(module, name, value)
 
